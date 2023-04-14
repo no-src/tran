@@ -5,7 +5,6 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/no-src/tran.svg)](https://pkg.go.dev/github.com/no-src/tran)
 [![Go Report Card](https://goreportcard.com/badge/github.com/no-src/tran)](https://goreportcard.com/report/github.com/no-src/tran)
 [![codecov](https://codecov.io/gh/no-src/tran/branch/main/graph/badge.svg?token=cp1R37aqHt)](https://codecov.io/gh/no-src/tran)
-[![Release](https://img.shields.io/github/v/release/no-src/tran)](https://github.com/no-src/tran/releases)
 
 A simple tcp transport server and client component.
 
