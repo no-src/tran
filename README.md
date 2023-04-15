@@ -21,6 +21,7 @@ package main
 
 import (
 	"bytes"
+	"time"
 
 	"github.com/no-src/gofs/auth"
 	"github.com/no-src/gofs/report"
@@ -49,11 +50,25 @@ func main() {
 	defer server.Close()
 
 	go server.Accept(func(client *tran.Conn, data []byte) {
-		buf := bytes.NewBuffer([]byte("hello world"))
-		buf.Write(tran.EndIdentity)
-		buf.Write(tran.LFBytes)
-		client.Write(buf.Bytes())
+		// parse client auth package and authorize
+		authPkg := bytes.TrimRight(data, string(tran.EndIdentity))
+		log.Info("receive message from client => %s", string(authPkg))
+		if bytes.Equal(authPkg, []byte("auth package mock")) {
+			user := users[0].ToHashUser()
+			ok, _ := server.Auth(user)
+			if ok {
+				client.MarkAuthorized(user)
+			}
+		}
 	})
+
+	go func() {
+		time.Sleep(time.Second * 3)
+		err = server.Send([]byte("hello world"))
+		if err != nil {
+			log.Error(err, "send message to clients error")
+		}
+	}()
 
 	// start client
 	client := tran.NewClient(ip, port, true, certFile, false)
@@ -64,8 +79,8 @@ func main() {
 	}
 	defer client.Close()
 
-	// communication
-	client.Write([]byte("bye~"))
+	// send custom auth package
+	client.Write([]byte("auth package mock"))
 	data, err := client.ReadAll()
 	if err != nil {
 		log.Error(err, "tcp client read server data error")
